@@ -1,0 +1,48 @@
+# XcodeGen spec. Replace {{APP}} and {{BUNDLE}} (e.g. APP=MyWidget,
+# BUNDLE=com.mywidget.MyWidget). Generate with: xcodegen generate
+name: {{APP}}
+options:
+  bundleIdPrefix: {{BUNDLE}}
+  deploymentTarget:
+    macOS: "14.0"        # 14+ required for interactive widget buttons (AppIntent)
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    GENERATE_INFOPLIST_FILE: "YES"
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_HARDENED_RUNTIME: "YES"
+
+targets:
+  {{APP}}:
+    type: application
+    platform: macOS
+    sources: [App, Shared]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: {{BUNDLE}}
+        PRODUCT_NAME: {{APP}}
+        CODE_SIGN_ENTITLEMENTS: App/{{APP}}.entitlements
+        INFOPLIST_FILE: App/Info.plist                 # registers the URL scheme
+        INFOPLIST_KEY_CFBundleDisplayName: {{APP}}
+        ENABLE_PREVIEWS: "YES"
+    dependencies:
+      - target: {{APP}}WidgetExtension
+        embed: true
+
+  {{APP}}WidgetExtension:
+    type: app-extension
+    platform: macOS
+    sources: [Widget, Shared]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: {{BUNDLE}}.Widget
+        PRODUCT_NAME: {{APP}}WidgetExtension
+        CODE_SIGN_ENTITLEMENTS: Widget/{{APP}}Widget.entitlements
+        INFOPLIST_FILE: Widget/Info.plist
+        INFOPLIST_KEY_CFBundleDisplayName: {{APP}}
+        ENABLE_PREVIEWS: "YES"
+        SKIP_INSTALL: "YES"

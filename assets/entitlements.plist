@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Use this identical file for BOTH App/<APP>.entitlements and
+     Widget/<APP>Widget.entitlements. The temporary-exception path MUST match the
+     data directory used in Store.swift exactly (trailing slash). Replace the path
+     with /Users/<you>/Library/Application Support/<APP>/ .
+     NO App Groups — that would force an Apple ID / provisioning profile. -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+	<key>com.apple.security.app-sandbox</key><true/>
+	<key>com.apple.security.temporary-exception.files.absolute-path.read-write</key>
+	<array>
+		<string>/Users/{{USER}}/Library/Application Support/{{APP}}/</string>
+	</array>
+</dict></plist>
