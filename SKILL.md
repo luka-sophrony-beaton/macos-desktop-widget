@@ -74,6 +74,13 @@ These are the load-bearing discoveries. Get them wrong and you waste hours.
 - **XcodeGen**: `brew install xcodegen` (you can do this).
 
 ## Build workflow
+0. **Design the data model before writing any code.** What does this widget
+   actually display, and does anything on the desktop tile itself need to be
+   tappable? A word/quote/name display, a counter with a streak, a mirror of
+   fetched external data (price, weather, next event), a short list — each
+   needs a differently-shaped `AppData`, not a reused one. See
+   `references/patterns.md` for the range of shapes and which parts of the
+   pattern are fixed vs. which are per-widget.
 1. Scaffold the source tree (see Structure below) and copy `assets/project.yml`,
    `assets/rebuild.sh`, `assets/entitlements.plist` (into both `App/` and
    `Widget/`), `assets/widget-Info.plist`, `assets/app-Info.plist`. Replace the
@@ -98,18 +105,18 @@ These are the load-bearing discoveries. Get them wrong and you waste hours.
   rebuild.sh                  # assets/rebuild.sh
   App/
     <APP>App.swift            # @main App + AppDelegate (quit on close, onOpenURL)
-    ContentView.swift         # companion UI: text input, steppers, log buttons
+    ContentView.swift         # companion UI: whatever this widget needs set/typed
     <APP>.entitlements        # assets/entitlements.plist (sandbox + temp-exception)
     Info.plist                # assets/app-Info.plist (CFBundleURLTypes scheme)
   Widget/
-    <APP>Widget.swift         # TimelineProvider + views (vibrant-aware buttons)
+    <APP>Widget.swift         # TimelineProvider + views (vibrant-aware rendering)
     <APP>WidgetBundle.swift   # @main WidgetBundle
-    LogIntent.swift           # AppIntent for the +N buttons
+    LogIntent.swift           # AppIntent — only if the widget has tappable buttons
     <APP>Widget.entitlements  # assets/entitlements.plist (same as app)
     Info.plist                # assets/widget-Info.plist (NSExtension widgetkit)
   Shared/
-    Store.swift               # resilient Codable model + file I/O + stats/streak
-    Theme.swift               # colors/fonts shared by app + widget
+    Store.swift               # universal file-I/O skeleton + this widget's own AppData shape
+    Theme.swift                # colors/fonts shared by app + widget
 ```
 
 ## Verification (do all of these — you usually can't see the screen)
