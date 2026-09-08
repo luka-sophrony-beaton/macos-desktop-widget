@@ -175,9 +175,26 @@ struct RepButton: View {
     }
 }
 
-// On the entry view, regardless of what it displays:
-//   .containerBackground(for: .widget) { Theme.backdrop }
-//   .widgetURL(URL(string: "<scheme>://open"))   // tap opens the app
+// Entry view: tap-to-open goes on a SPECIFIC element via Link, never as a
+// container-wide .widgetURL — a plain display widget (no buttons) is the one
+// exception where .widgetURL on the whole container is fine, since there's
+// nothing for it to compete with.
+struct EntryView: View {
+    var entry: SomeEntry
+    var body: some View {
+        VStack {
+            // If the widget has a Button(intent:) anywhere below, tap-to-open
+            // MUST be scoped like this, not container-wide — see gotcha #12:
+            // a wide .widgetURL can win the tap over the button underneath it.
+            Link(destination: URL(string: "<scheme>://open")!) {
+                Text("...")   // whatever non-button content opens the app
+            }
+            RepButton(amount: 1)   // stays fully interactive, isolated from the Link above
+        }
+        .containerBackground(for: .widget) { Theme.backdrop }
+        // No .widgetURL here when there's a button in this view.
+    }
+}
 
 struct MyWidget: Widget {
     var body: some WidgetConfiguration {

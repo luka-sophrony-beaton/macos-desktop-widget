@@ -80,3 +80,27 @@ The user may decline screen-control. Verify everything from the CLI instead:
 <scheme>://open` for tap-to-open, DiagnosticReports for crashes. Don't claim the
 widget "works on the desktop" from a build success alone — verify the registration
 and data-flow you actually can.
+
+### 12. Tapping the widget's OWN button opens the app instead of running the
+action in place → `.widgetURL` is scoped too wide
+Symptom: the widget has a `Button(intent:)` (e.g. a +1 tap target) AND
+`.widgetURL(...)` for tap-to-open, and tapping the *button* also opens the
+app / shows the app's window instead of just running the `AppIntent` in
+place. Cause: applying `.widgetURL()` to the whole container view (the same
+`VStack` that holds the button) makes the entire tile one big tap target for
+the URL, and on macOS desktop widgets this can win over the button
+underneath instead of yielding to it. Fix: **never put `.widgetURL()` on
+the root container that also holds an interactive button.** Instead wrap
+only a specific non-button element — e.g. the title/header `Text` — in a
+`Link(destination:)`:
+```swift
+VStack {
+    Link(destination: URL(string: "<scheme>://open")!) {
+        Text("...")   // tapping THIS opens the app
+    }
+    Button(intent: MyIntent()) { Text("+1") }   // tapping THIS stays on the desktop
+}
+.containerBackground(for: .widget) { ... }   // no .widgetURL here
+```
+Any interactive widget that has both a tappable button and a tap-to-open
+target needs this scoping — it's not optional once both exist together.
